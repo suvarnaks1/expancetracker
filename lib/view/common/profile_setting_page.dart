@@ -1,6 +1,7 @@
+import 'package:expance_tracker_app/core/auth_service.dart';
 import 'package:expance_tracker_app/resources/colors.dart';
+import 'package:expance_tracker_app/view/auth/login_page.dart';
 import 'package:flutter/material.dart';
-
 
 class ProfileSettingsPage extends StatelessWidget {
   const ProfileSettingsPage({super.key});
@@ -27,7 +28,8 @@ class ProfileSettingsPage extends StatelessWidget {
             // Avatar, name, email, and "Edit Profile"
             CircleAvatar(
               radius: 48,
-              backgroundImage: const AssetImage('assets/littlebigcolours-ferret-female-hacker-wearing-hoodie-dark-spotlight-glowing-elem-a3fc19e5-5ea3-481d-b8ce-70a30262d15a.jpg'),
+              backgroundImage: const AssetImage(
+                  'assets/littlebigcolours-ferret-female-hacker-wearing-hoodie-dark-spotlight-glowing-elem-a3fc19e5-5ea3-481d-b8ce-70a30262d15a.jpg'),
             ),
             const SizedBox(height: 12),
             const Text('Jacob Timberline',
@@ -80,10 +82,39 @@ class ProfileSettingsPage extends StatelessWidget {
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
 
-                  _buildTile(icon: Icons.person_outline, title: 'My Account'),
-                  _buildTile(icon: Icons.notifications_outlined, title: 'Notification'),
-                  _buildTile(icon: Icons.lock_outline, title: 'Privacy'),
-                  _buildTile(icon: Icons.info_outline, title: 'About'),
+                  _buildTile(
+                    icon: Icons.person_outline,
+                    title: 'My Account',
+                    onTap: () {},
+                  ),
+                  _buildTile(
+                    icon: Icons.notifications_outlined,
+                    title: 'Notification',
+                    onTap: () {},
+                  ),
+                  _buildTile(
+                    icon: Icons.lock_outline,
+                    title: 'Privacy',
+                    onTap: () {},
+                  ),
+                  _buildTile(
+                    icon: Icons.info_outline,
+                    title: 'About',
+                    onTap: () {},
+                  ),
+                  _buildTile(
+                    icon: Icons.logout,
+                    title: 'SignOut',
+                    onTap: () async {
+                      await AuthService().signOut();
+
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        (route) => false,
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -97,6 +128,7 @@ class ProfileSettingsPage extends StatelessWidget {
     required IconData icon,
     required String title,
     String? subtitle,
+    VoidCallback? onTap,
   }) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -104,12 +136,11 @@ class ProfileSettingsPage extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, color: AppColors.deepPink),
         title: Text(title, style: TextStyle(color: AppColors.deepPink)),
-        subtitle:
-            subtitle != null ? Text(subtitle, style: const TextStyle(fontSize: 12)) : null,
+        subtitle: subtitle != null
+            ? Text(subtitle, style: const TextStyle(fontSize: 12))
+            : null,
         trailing: Icon(Icons.chevron_right, color: AppColors.deepPink),
-        onTap: () {
-          // Navigate to detail
-        },
+        onTap: onTap,
       ),
     );
   }

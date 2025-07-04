@@ -1,4 +1,5 @@
 import 'package:expance_tracker_app/resources/colors.dart';
+import 'package:expance_tracker_app/view/additems/add_items.dart';
 import 'package:expance_tracker_app/view/common/expance.dart';
 import 'package:expance_tracker_app/view/common/home_screen.dart';
 import 'package:expance_tracker_app/view/common/profile_setting_page.dart';
@@ -43,7 +44,13 @@ class _MainScreenState extends State<BottomNav> {
         child: FloatingActionButton(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          onPressed: () => print('FAB tapped'),
+          onPressed: (){
+Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => AddItems()),
+                        (route) => false,
+                      );
+          },
           child: const Icon(Icons.add, size: 32),
         ),
       ),

@@ -1,3 +1,5 @@
+import 'package:expance_tracker_app/view/common/bottom_nav.dart';
+import 'package:expance_tracker_app/view/common/expance.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -8,7 +10,7 @@ import 'package:expance_tracker_app/model/expance_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AddItems extends StatefulWidget {
-  const AddItems({Key? key}) : super(key: key);
+  const AddItems({Key? key, required String existingId, required initialAmount, required initialDesc, required initialCategory, final DateTime? initialDate}) : super(key: key);
   @override
   State<AddItems> createState() => _AddItemsState();
 }
@@ -106,7 +108,10 @@ class _AddItemsState extends State<AddItems> {
           .add(exp.toMap());
 
       if (!mounted) return;
-      Navigator.pop(context);
+       Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ExpenseMonthView()),
+            );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -132,7 +137,15 @@ class _AddItemsState extends State<AddItems> {
         appBar: AppBar(
           title: const Text('Add New Item'),
           backgroundColor: AppColors.mediumPink,
-        ),
+          leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+           Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => BottomNav()),
+            );
+        },
+        ),),
         backgroundColor: AppColors.lightPink1,
         body: Padding(
           padding: const EdgeInsets.all(16),

@@ -47,7 +47,7 @@ class _MainScreenState extends State<BottomNav> {
           onPressed: (){
 Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => AddItems()),
+                        MaterialPageRoute(builder: (_) => AddItems(existingId: '', initialAmount: null, initialDesc: null, initialCategory: null, )),
                         (route) => false,
                       );
           },

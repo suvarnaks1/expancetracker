@@ -1,11 +1,13 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:expance_tracker_app/resources/colors.dart';
 import 'package:expance_tracker_app/view/additems/add_items.dart';
+
+import 'widgets/barchart.dart';
+import 'widgets/pichart.dart';
 
 class ExpenseMonthView extends StatefulWidget {
   const ExpenseMonthView({super.key});
@@ -17,6 +19,14 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
   String interval = 'Month'; // can be 'Day', 'Week', or 'Month'
   String activeTab = 'All';
   int touchedPie = -1, touchedBar = -1;
+
+  Color _colorFor(String cat) =>
+      {
+        'Food': Colors.green,
+        'Shopping': Colors.orange,
+        'Transport': Colors.blue,
+      }[cat] ??
+      Colors.grey;
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +96,8 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // — Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,8 +123,9 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                     child: ChoiceChip(
                       label: Text(lbl,
                           style: TextStyle(
-                              color:
-                                  selected ? Colors.white : AppColors.deepPink)),
+                              color: selected
+                                  ? Colors.white
+                                  : AppColors.deepPink)),
                       selected: selected,
                       selectedColor: AppColors.deepPink,
                       backgroundColor: AppColors.lightPink2,
@@ -130,14 +142,50 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
               // — Pie Chart
               Text('Spending by Category',
                   style: Theme.of(context).textTheme.titleMedium),
-              SizedBox(
-                height: 200,
-                child: PieChartWidget(
-                  data: catSpend,
-                  touchedIndex: touchedPie,
-                  onTap: (i) => setState(() => touchedPie = i),
-                ),
+
+          SizedBox(
+  height: 200,
+  child: Row(
+    children: [
+      Expanded(
+        child: PieChartWidget(
+          data: catSpend,
+          touchedIndex: touchedPie,
+          onTap: (i) => setState(() => touchedPie = i),
+        ),
+      ),
+      const SizedBox(width: 16),
+      ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 120),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: catSpend.entries.map((e) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: _colorFor(e.key),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(e.key, style: const TextStyle(fontSize: 14)),
+                ],
               ),
+            );
+          }).toList(),
+        ),
+      ),
+    ],
+  ),
+),
+
+
               const SizedBox(height: 24),
 
               // — Bar Chart
@@ -167,8 +215,8 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                       selected: sel,
                       selectedColor: AppColors.deepPink,
                       backgroundColor: AppColors.lightPink2,
-                      labelStyle:
-                          TextStyle(color: sel ? Colors.white : AppColors.deepPink),
+                      labelStyle: TextStyle(
+                          color: sel ? Colors.white : AppColors.deepPink),
                       onSelected: (_) => setState(() => activeTab = tab),
                     ),
                   );
@@ -232,119 +280,6 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
   }
 }
 
-// Pie Chart Widget
-class PieChartWidget extends StatelessWidget {
-  final Map<String, double> data;
-  final int touchedIndex;
-  final void Function(int) onTap;
-
-  const PieChartWidget({
-    super.key,
-    required this.data,
-    required this.touchedIndex,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final total = data.values.fold(0.0, (a, b) => a + b);
-    return PieChart(PieChartData(
-      sectionsSpace: 2,
-      centerSpaceRadius: 40,
-      pieTouchData: PieTouchData(touchCallback: (_, resp) {
-        onTap(resp?.touchedSection?.touchedSectionIndex ?? -1);
-      }),
-      sections: List.generate(data.length, (i) {
-        final e = data.entries.elementAt(i);
-        final isTouched = i == touchedIndex;
-        final pct = total == 0 ? '0%' : '${(e.value / total * 100).toStringAsFixed(1)}%';
-        return PieChartSectionData(
-          color: _colorFor(e.key),
-          value: e.value,
-          title: pct,
-          radius: isTouched ? 70 : 60,
-          titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
-        );
-      }),
-    ));
-  }
-
-  Color _colorFor(String cat) => {
-        'Food': Colors.green,
-        'Shopping': Colors.orange,
-        'Transport': Colors.blue,
-      }[cat] ??
-      Colors.grey;
-}
-
-// Bar Chart Widget
-class BarChartWidget extends StatelessWidget {
-  final List<double> data;
-  final int touchedIndex;
-  final void Function(int) onTap;
-  final String interval;
-
-  const BarChartWidget({
-    super.key,
-    required this.data,
-    required this.touchedIndex,
-    required this.onTap,
-    required this.interval,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final maxY = (data.isEmpty ? 0 : data.reduce(max)) * 1.2;
-    return BarChart(BarChartData(
-      maxY: maxY,
-      barTouchData: BarTouchData(touchCallback: (_, resp) {
-        final i = resp?.spot?.touchedBarGroupIndex;
-        if (i != null && i >= 0 && i < data.length) onTap(i);
-      }),
-      titlesData: FlTitlesData(
-        bottomTitles: AxisTitles(sideTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 32,
-          getTitlesWidget: (val, meta) {
-            final i = val.toInt();
-            if (i < 0 || i >= data.length) return const SizedBox();
-            String lbl;
-            if (interval == 'Day') lbl = '${i}h';
-            else if (interval == 'Week') {
-              const wk = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-              lbl = wk[i];
-            } else {
-              lbl = '${i + 1}';
-            }
-            return SideTitleWidget(
-  meta: meta, // ✅ required
-  space: 8.0,
-  angle: 0.0, // optional, remove if not needed
-  child: Text(lbl, style: TextStyle(color: AppColors.deepPink, fontSize: 10)),
-);
-
-
-          },
-        )),
-        leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40)),
-      ),
-      gridData: FlGridData(show: false),
-      borderData: FlBorderData(show: false),
-      barGroups: List.generate(data.length, (i) {
-        final isTouched = i == touchedIndex;
-        return BarChartGroupData(x: i, barRods: [
-          BarChartRodData(
-            toY: data[i],
-            color: AppColors.mediumPink,
-            width: isTouched ? 20 : 16,
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ]);
-      }),
-    ));
-  }
-}
-
 // Transaction card widget
 class TransactionCardView extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -363,7 +298,8 @@ class TransactionCardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.lightPink2, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+          color: AppColors.lightPink2, borderRadius: BorderRadius.circular(12)),
       child: Row(
         children: [
           CircleAvatar(
@@ -372,18 +308,27 @@ class TransactionCardView extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(data['description'], style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(data['category'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(data['description'],
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(data['category'],
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
             ]),
           ),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('-\$${(data['amount'] as num).toStringAsFixed(2)}',
-                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-            Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                style: const TextStyle(
+                    color: Colors.red, fontWeight: FontWeight.bold)),
+            Text(date,
+                style: const TextStyle(color: Colors.grey, fontSize: 12)),
           ]),
-          IconButton(icon: Icon(Icons.edit, color: AppColors.deepPink), onPressed: onEdit),
-          IconButton(icon: const Icon(Icons.delete, color: Colors.grey), onPressed: onDelete),
+          IconButton(
+              icon: Icon(Icons.edit, color: AppColors.deepPink),
+              onPressed: onEdit),
+          IconButton(
+              icon: const Icon(Icons.delete, color: Colors.grey),
+              onPressed: onDelete),
         ],
       ),
     );

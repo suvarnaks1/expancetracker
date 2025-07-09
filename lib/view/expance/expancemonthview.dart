@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-
 import 'package:expance_tracker_app/resources/colors.dart';
 import 'package:expance_tracker_app/view/additems/add_items.dart';
-
 import 'widgets/barchart.dart';
 import 'widgets/pichart.dart';
 
@@ -143,48 +141,48 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
               Text('Spending by Category',
                   style: Theme.of(context).textTheme.titleMedium),
 
-          SizedBox(
-  height: 200,
-  child: Row(
-    children: [
-      Expanded(
-        child: PieChartWidget(
-          data: catSpend,
-          touchedIndex: touchedPie,
-          onTap: (i) => setState(() => touchedPie = i),
-        ),
-      ),
-      const SizedBox(width: 16),
-      ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 120),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: catSpend.entries.map((e) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: _colorFor(e.key),
-                      shape: BoxShape.circle,
+              SizedBox(
+                height: 200,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: PieChartWidget(
+                        data: catSpend,
+                        touchedIndex: touchedPie,
+                        onTap: (i) => setState(() => touchedPie = i),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(e.key, style: const TextStyle(fontSize: 14)),
-                ],
+                    const SizedBox(width: 16),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 120),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: catSpend.entries.map((e) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: _colorFor(e.key),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(e.key,
+                                    style: const TextStyle(fontSize: 14)),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          }).toList(),
-        ),
-      ),
-    ],
-  ),
-),
-
 
               const SizedBox(height: 24),
 

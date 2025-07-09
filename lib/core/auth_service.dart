@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
 
   // Use userChanges() to listen for profile changes including email verification
   Stream<User?> get authStateChanges => _auth.userChanges();

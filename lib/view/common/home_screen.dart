@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expance_tracker_app/resources/colors.dart' show AppColors;
 import 'package:expance_tracker_app/view/additems/add_items.dart';
-import 'package:expance_tracker_app/view/expance/expancemonthview.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +16,8 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
   String activeTab = 'All';
   List<DocumentSnapshot> visibleList = [];
   Map<String, double> catSpend = {};
+  double totalIncome = 0;
+  double totalExpense = 0;
 
   @override
   void initState() {
@@ -37,24 +38,39 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
 
     final docs = querySnapshot.docs;
 
+    double income = 0;
+    double expense = 0;
+    final categoryMap = <String, double>{};
+
+    for (var doc in docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final cat = data['category'] ?? 'Others';
+      final amount = (data['amount'] as num).toDouble();
+      final isIncome = data['type'] == 'income';
+
+      if (isIncome) {
+        income += amount;
+      } else {
+        expense += amount;
+      }
+
+      categoryMap[cat] = (categoryMap[cat] ?? 0) + amount;
+    }
+
     setState(() {
+      totalIncome = income;
+      totalExpense = expense;
+      catSpend = categoryMap;
       visibleList = activeTab == 'All'
           ? docs
           : docs.where((doc) => doc['category'] == activeTab).toList();
-
-      catSpend = {};
-      for (var doc in docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        final cat = data['category'] ?? 'Others';
-        final amount = (data['amount'] as num).toDouble();
-        catSpend[cat] = (catSpend[cat] ?? 0) + amount;
-      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    final balance = totalIncome - totalExpense;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -65,7 +81,6 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with profile
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -73,7 +88,6 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                       stream: FirebaseAuth.instance.userChanges(),
                       builder: (context, snapshot) {
                         final user = snapshot.data;
-
                         return Row(
                           children: [
                             if (user?.photoURL != null)
@@ -108,29 +122,24 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                         );
                       },
                     ),
-                    const Icon(
-                      Icons.notifications_none,
-                      color: AppColors.deepPink,
-                    ),
+                    const Icon(Icons.notifications_none, color: AppColors.deepPink),
                   ],
                 ),
 
                 const SizedBox(height: 24),
 
-                // Balance
-                const Text('\$4,586.00',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                Text('\$${balance.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 const Text('Total Balance', style: TextStyle(color: Colors.grey)),
                 const SizedBox(height: 24),
 
-                // Income and Expense Cards
                 Row(
                   children: [
-                    _buildInfoCard('Income', '\$2,450.00', Colors.green.shade100,
-                        Icons.arrow_upward),
+                    _buildInfoCard('Income', '\$${totalIncome.toStringAsFixed(2)}',
+                        Colors.green.shade100, Icons.arrow_upward),
                     const SizedBox(width: 16),
-                    _buildInfoCard('Expense', '-\$710.00', Colors.red.shade100,
-                        Icons.arrow_downward),
+                    _buildInfoCard('Expense', '-\$${totalExpense.toStringAsFixed(2)}',
+                        Colors.red.shade100, Icons.arrow_downward),
                   ],
                 ),
 
@@ -139,7 +148,6 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
 
-                // Category Filter Chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -164,7 +172,6 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                 ),
                 const SizedBox(height: 16),
 
-                // Transactions List
                 ...visibleList.map((doc) {
                   final d = doc.data() as Map<String, dynamic>;
                   final dt = (d['date'] as Timestamp).toDate();
@@ -184,7 +191,7 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                             initialDate: dt,
                           ),
                         ),
-                      ),
+                      ).then((_) => fetchTransactions()),
                       onDelete: () => _confirmDelete(uid!, doc.id),
                     ),
                   );
@@ -254,4 +261,75 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
   }
 }
 
-// Make sure you have this file: transaction_card_view.dart with TransactionCardView widget
+class TransactionCardView extends StatelessWidget {
+  final Map<String, dynamic> data;
+  final String date;
+  final VoidCallback onEdit, onDelete;
+
+  const TransactionCardView({
+    super.key,
+    required this.data,
+    required this.date,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: AppColors.lightPink2, borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            child: Icon(_iconFor(data['category']), color: AppColors.deepPink),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(data['description'],
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(data['category'],
+                    style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                (data['type'] == 'income'
+                    ? '+\$${(data['amount'] as num).toStringAsFixed(2)}'
+                    : '-\$${(data['amount'] as num).toStringAsFixed(2)}'),
+                style: TextStyle(
+                  color: data['type'] == 'income' ? Colors.green : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            ],
+          ),
+          IconButton(icon: Icon(Icons.edit, color: AppColors.deepPink), onPressed: onEdit),
+          IconButton(icon: const Icon(Icons.delete, color: Colors.grey), onPressed: onDelete),
+        ],
+      ),
+    );
+  }
+
+  IconData _iconFor(String cat) {
+    switch (cat) {
+      case 'Food':
+        return Icons.fastfood;
+      case 'Shopping':
+        return Icons.shopping_bag;
+      case 'Transport':
+        return Icons.directions_car;
+      default:
+        return Icons.category;
+    }
+  }
+}

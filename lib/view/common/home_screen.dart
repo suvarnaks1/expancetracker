@@ -16,51 +16,54 @@ class FinanceDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  StreamBuilder<User?>(
-                    stream: FirebaseAuth.instance.userChanges(),
-                    builder: (context, snapshot) {
-                      final user = snapshot.data;
-                      return Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: user?.photoURL != null
-                                ? NetworkImage(user!.photoURL!)
-                                : AssetImage('assets/default_avatar.jpg')
-                                    as ImageProvider,
-                          ),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Hey, ${user?.displayName ?? 'User'}!',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              if (user?.email != null)
-                                Text(
-                                  user!.email!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  Icon(Icons.notifications_none, color: AppColors.deepPink),
-                ],
+        Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.userChanges(),
+      builder: (context, snapshot) {
+        final user = snapshot.data;
+
+        return Row(
+          children: [
+            if (user?.photoURL != null)
+              CircleAvatar(
+                radius: 20,
+                backgroundImage: NetworkImage(user!.photoURL!),
               ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hey, ${user?.displayName ?? 'User'}!',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                if (user?.email != null)
+                  Text(
+                    user!.email!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
+    ),
+    const Icon(
+      Icons.notifications_none,
+      color: AppColors.deepPink, // Make sure this color is defined in AppColors
+    ),
+  ],
+),
+
               const SizedBox(height: 24),
 
               // Total Balance

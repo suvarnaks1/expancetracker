@@ -1,110 +1,79 @@
+import 'package:expance_tracker_app/core/auth_service.dart';
+import 'package:expance_tracker_app/view/auth/signup_page.dart';
+import 'package:expance_tracker_app/view/common/bottom_nav.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../resources/colors.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
 
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
+class LoginPage extends StatelessWidget {
+  final FirebaseAuthService _auth = FirebaseAuthService();
 
-  Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailCtrl.text.trim(),
-        password: _passwordCtrl.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'user-not-found':
-          _error = 'No user found with that email.';
-          break;
-        case 'wrong-password':
-          _error = 'Incorrect password.';
-          break;
-        case 'invalid-email':
-          _error = 'Invalid email format.';
-          break;
-        case 'too-many-requests':
-          _error = 'Too many attempts. Try again later.';
-          break;
-        default:
-          _error = e.message;
-      }
-    } catch (e) {
-      _error = 'Unexpected error: ${e.toString()}';
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
-  void dispose() {
-    _emailCtrl.dispose();
-    _passwordCtrl.dispose();
-    super.dispose();
-  }
+  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        backgroundColor: AppColors.mediumPink,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _emailCtrl,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) =>
-                    v != null && v.contains('@') ? null : 'Enter a valid email',
+      appBar: AppBar(title: const Text('Login Page')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Enter Email',border: OutlineInputBorder(),),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Enter Password',border: OutlineInputBorder(),),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final email = _emailController.text.trim();
+                final password = _passwordController.text.trim();
+
+                if (email.isEmpty || password.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Enter all fields")),
+                  );
+                  return;
+                }
+
+                try {
+                  final user = await _auth.loginWithEmailAndPassword(email, password);
+                  if (user != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Login Successful")),
+                    );
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNav()));
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Login Failed: $e")),
+                  );
+                }
+              },
+              child: const Text('Login Now'),
+            ),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SignupPage()));
+              },
+              child: const Text(
+                "New user? Click here",
+                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordCtrl,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (v) =>
-                    v != null && v.length >= 6 ? null : 'Min 6 characters',
-              ),
-              const SizedBox(height: 24),
-              if (_error != null)
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 12),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(onPressed: _signIn, child: const Text('Login')),
-              TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/signup'),
-                child: Text(
-                  "Don't have an account? Sign Up",
-                  style: TextStyle(color: AppColors.deepPink),
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );
   }
 }
+

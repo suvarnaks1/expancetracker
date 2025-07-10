@@ -106,11 +106,11 @@ class ProfileSettingsPage extends StatelessWidget {
                     icon: Icons.logout,
                     title: 'SignOut',
                     onTap: () async {
-                      await AuthService().signOut();
+                      await FirebaseAuthService().signOut();
 
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (_) => const LoginPage()),
+                        MaterialPageRoute(builder: (_) =>  LoginPage()),
                         (route) => false,
                       );
                     },

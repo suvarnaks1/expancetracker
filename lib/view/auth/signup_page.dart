@@ -1,106 +1,78 @@
+import 'package:expance_tracker_app/core/auth_service.dart';
+import 'package:expance_tracker_app/view/auth/login_page.dart';
+import 'package:expance_tracker_app/view/common/bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../resources/colors.dart';
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
-  @override
-  _SignupPageState createState() => _SignupPageState();
-}
+class SignupPage extends StatelessWidget {
+  final FirebaseAuthService _auth = FirebaseAuthService();
 
-class _SignupPageState extends State<SignupPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  bool _isLoading = false;
-  String? _error;
-
-  Future<void> _signUp() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailCtrl.text.trim(),
-        password: _passwordCtrl.text,
-      );
-      await cred.user?.sendEmailVerification();
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'weak-password':
-          _error = 'Password is too weak.';
-          break;
-        case 'email-already-in-use':
-          _error = 'An account already exists for that email.';
-          break;
-        case 'invalid-email':
-          _error = 'Invalid email format.';
-          break;
-        default:
-          _error = e.message;
-      }
-    } catch (e) {
-      _error = 'Unexpected error: ${e.toString()}';
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
-  void dispose() {
-    _emailCtrl.dispose();
-    _passwordCtrl.dispose();
-    super.dispose();
-  }
+ SignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _emailController = TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-        backgroundColor: AppColors.mediumPink,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _emailCtrl,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) =>
-                    v != null && v.contains('@') ? null : 'Enter a valid email',
+      appBar: AppBar(title: const Text('Register Page')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Enter Email',
+              border: OutlineInputBorder(),),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Enter Password',border: OutlineInputBorder(),),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final email = _emailController.text.trim();
+                final password = _passwordController.text.trim();
+
+                if (email.isEmpty || password.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Enter all fields")),
+                  );
+                  return;
+                }
+
+                try {
+                  final user = await _auth.registerWithEmailAndPassword(email, password);
+                  if (user != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Registration Successful")),
+                    );
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => BottomNav()));
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Registration Failed: $e")),
+                  );
+                }
+              },
+              child: const Text('Register Now'),
+            ),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
+              },
+              child: const Text(
+                "Already have an account? Click here",
+                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordCtrl,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (v) =>
-                    v != null && v.length >= 6 ? null : 'Min 6 characters',
-              ),
-              const SizedBox(height: 24),
-              if (_error != null)
-                Text(_error!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 12),
-              _isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(onPressed: _signUp, child: const Text('Sign Up')),
-              TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-                child: Text(
-                  "Already have an account? Login",
-                  style: TextStyle(color: AppColors.deepPink),
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

@@ -198,55 +198,10 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                   interval: interval,
                 ),
               ),
-              const SizedBox(height: 24),
+             
+          
 
-              // — Category Filter Chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                    children: ['All', ...catSpend.keys].map((tab) {
-                  final sel = tab == activeTab;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: ChoiceChip(
-                      label: Text(tab),
-                      selected: sel,
-                      selectedColor: AppColors.deepPink,
-                      backgroundColor: AppColors.lightPink2,
-                      labelStyle: TextStyle(
-                          color: sel ? Colors.white : AppColors.deepPink),
-                      onSelected: (_) => setState(() => activeTab = tab),
-                    ),
-                  );
-                }).toList()),
-              ),
-              const SizedBox(height: 16),
-
-              // — Transactions List
-              ...visibleList.map((doc) {
-                final d = doc.data() as Map<String, dynamic>;
-                final dt = (d['date'] as Timestamp).toDate();
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TransactionCardView(
-                    data: d,
-                    date: DateFormat.yMMMd().format(dt),
-                    onEdit: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AddItems(
-                          existingId: doc.id,
-                          initialAmount: d['amount'].toDouble(),
-                          initialDesc: d['description'],
-                          initialCategory: d['category'],
-                          initialDate: dt,
-                        ),
-                      ),
-                    ),
-                    onDelete: () => _confirmDelete(uid, doc.id),
-                  ),
-                );
-              }).toList(),
+      
             ]),
           );
         },
@@ -254,28 +209,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
     );
   }
 
-  void _confirmDelete(String uid, String id) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Delete?'),
-        content: const Text('Are you sure you want to delete this item?'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
-          TextButton(
-              onPressed: () {
-                FirebaseFirestore.instance
-                    .doc('users/$uid/expenses/$id')
-                    .delete();
-                Navigator.pop(context);
-              },
-              child: const Text('Delete', style: TextStyle(color: Colors.red))),
-        ],
-      ),
-    );
-  }
+
 }
 
 // Transaction card widget

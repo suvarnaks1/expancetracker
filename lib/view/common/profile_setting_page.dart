@@ -1,6 +1,7 @@
 import 'package:expance_tracker_app/core/auth_service.dart';
 import 'package:expance_tracker_app/resources/colors.dart';
 import 'package:expance_tracker_app/view/auth/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileSettingsPage extends StatelessWidget {
@@ -26,21 +27,46 @@ class ProfileSettingsPage extends StatelessWidget {
             ),
 
             // Avatar, name, email, and "Edit Profile"
-            CircleAvatar(
-              radius: 48,
-              backgroundImage: const AssetImage(
-                  'assets/littlebigcolours-ferret-female-hacker-wearing-hoodie-dark-spotlight-glowing-elem-a3fc19e5-5ea3-481d-b8ce-70a30262d15a.jpg'),
-            ),
-            const SizedBox(height: 12),
-            const Text('Jacob Timberline',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text('JacobTimber@gmail.com',
-                style: TextStyle(color: AppColors.deepPink.withOpacity(0.7))),
-            TextButton(
-              onPressed: () {},
-              child: Text('Edit Profile',
-                  style: TextStyle(color: AppColors.mediumPink)),
-            ),
+           StreamBuilder<User?>(
+  stream: FirebaseAuth.instance.userChanges(),
+  builder: (context, snapshot) {
+    final user = snapshot.data;
+
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 48,
+          backgroundImage: user?.photoURL != null
+              ? NetworkImage(user!.photoURL!)
+              : null,
+          child: user?.photoURL == null
+              ? const Icon(Icons.person, size: 48, color: Colors.white)
+              : null,
+          backgroundColor: AppColors.deepPink.withOpacity(0.2),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          user?.displayName ?? 'User Name',
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          user?.email ?? 'user@email.com',
+          style: TextStyle(color: AppColors.deepPink.withOpacity(0.7)),
+        ),
+        TextButton(
+          onPressed: () {
+            // TODO: Implement profile edit
+          },
+          child: Text(
+            'Edit Profile',
+            style: TextStyle(color: AppColors.mediumPink),
+          ),
+        ),
+      ],
+    );
+  },
+),
+
 
             const SizedBox(height: 24),
             // "General" section label

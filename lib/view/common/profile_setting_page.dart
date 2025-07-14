@@ -3,6 +3,7 @@ import 'package:expance_tracker_app/resources/colors.dart';
 import 'package:expance_tracker_app/view/about/about.dart';
 import 'package:expance_tracker_app/view/auth/login_page.dart';
 import 'package:expance_tracker_app/view/privacy/privacy.dart';
+import 'package:expance_tracker_app/view/profile_settings/profile_edit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -28,65 +29,7 @@ class ProfileSettingsPage extends StatelessWidget {
               ),
             ),
 
-            // Avatar, name, email, and "Edit Profile"
-            StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.userChanges(),
-              builder: (context, snapshot) {
-                final user = snapshot.data;
-
-                return Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 48,
-                      backgroundImage: user?.photoURL != null
-                          ? NetworkImage(user!.photoURL!)
-                          : null,
-                      child: user?.photoURL == null
-                          ? const Icon(Icons.person,
-                              size: 48, color: Colors.white)
-                          : null,
-                      backgroundColor: AppColors.deepPink.withOpacity(0.2),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      user?.displayName ?? 'User Name',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      user?.email ?? 'user@email.com',
-                      style:
-                          TextStyle(color: AppColors.deepPink.withOpacity(0.7)),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // TODO: Implement profile edit
-                      },
-                      child: Text(
-                        'Edit Profile',
-                        style: TextStyle(color: AppColors.mediumPink),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-            // "General" section label
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'General',
-                  style: TextStyle(
-                      color: AppColors.deepPink.withOpacity(0.8),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
+      
 
             const SizedBox(height: 8),
             // General settings tiles
@@ -94,15 +37,6 @@ class ProfileSettingsPage extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 children: [
-                  _buildTile(
-                      icon: Icons.location_on_outlined,
-                      title: 'Bank Location',
-                      subtitle: '7307 Grand, Ava, Flushing NY1347'),
-                  _buildTile(
-                      icon: Icons.account_balance_wallet_outlined,
-                      title: 'My wallet',
-                      subtitle: 'Manage your saved wallet'),
-
                   const SizedBox(height: 24),
                   // "Account" section
                   Text('Account',
@@ -117,11 +51,7 @@ class ProfileSettingsPage extends StatelessWidget {
                     title: 'My Account',
                     onTap: () {},
                   ),
-                  _buildTile(
-                    icon: Icons.notifications_outlined,
-                    title: 'Notification',
-                    onTap: () {},
-                  ),
+
                   _buildTile(
                     icon: Icons.lock_outline,
                     title: 'Privacy',
@@ -136,11 +66,13 @@ class ProfileSettingsPage extends StatelessWidget {
                   _buildTile(
                     icon: Icons.info_outline,
                     title: 'About',
-                    onTap: () { Navigator.push(
+                    onTap: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => AboutAppScreen()),
-                      );},
+                      );
+                    },
                   ),
                   _buildTile(
                     icon: Icons.logout,

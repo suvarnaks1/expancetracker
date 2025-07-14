@@ -3,6 +3,7 @@ import 'package:expance_tracker_app/view/additems/add_items.dart';
 import 'package:expance_tracker_app/view/expance/expancemonthview.dart';
 import 'package:expance_tracker_app/view/common/home_screen.dart';
 import 'package:expance_tracker_app/view/common/profile_setting_page.dart';
+import 'package:expance_tracker_app/view/profile_settings/profile_edit.dart';
 import 'package:flutter/material.dart';
 
 
@@ -18,8 +19,9 @@ class _MainScreenState extends State<BottomNav> {
   final _pages = [
     FinanceDashboard(),
     ExpenseMonthView(),
-   ProfileSettingsPage(),
-    const Center(child: Text('Settings')),
+    EditProfileScreen(),
+    ProfileSettingsPage(),
+    
   ];
 
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);

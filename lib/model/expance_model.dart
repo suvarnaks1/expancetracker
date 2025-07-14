@@ -33,4 +33,6 @@ class Expense {
       date: (d['date'] as Timestamp).toDate(),
     );
   }
+
+  static fromMap({required String id, required Map<String, dynamic> data}) {}
 }

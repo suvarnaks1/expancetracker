@@ -1,4 +1,3 @@
-
 import 'package:expance_tracker_app/core/auth_gate.dart';
 import 'package:expance_tracker_app/view/common/bottom_nav.dart';
 import 'package:firebase_core/firebase_core.dart';

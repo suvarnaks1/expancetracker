@@ -3,8 +3,6 @@ import 'package:expance_tracker_app/resources/colors.dart';
 import 'package:expance_tracker_app/view/about/about.dart';
 import 'package:expance_tracker_app/view/auth/login_page.dart';
 import 'package:expance_tracker_app/view/privacy/privacy.dart';
-import 'package:expance_tracker_app/view/profile_settings/profile_edit.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ProfileSettingsPage extends StatelessWidget {

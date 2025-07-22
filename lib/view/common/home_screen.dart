@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expance_tracker_app/resources/colors.dart' show AppColors;
 import 'package:expance_tracker_app/view/additems/add_items.dart';
+import 'package:expance_tracker_app/widgets/updated_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -122,7 +123,7 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                         );
                       },
                     ),
-                    const Icon(Icons.notifications_none, color: AppColors.deepPink),
+                   
                   ],
                 ),
 
@@ -183,13 +184,7 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                       onEdit: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AddItems(
-                            existingId: doc.id,
-                            initialAmount: d['amount'].toDouble(),
-                            initialDesc: d['description'],
-                            initialCategory: d['category'],
-                            initialDate: dt,
-                          ),
+                          builder: (_) => UpdatedPage()
                         ),
                       ).then((_) => fetchTransactions()),
                       onDelete: () => _confirmDelete(uid!, doc.id),

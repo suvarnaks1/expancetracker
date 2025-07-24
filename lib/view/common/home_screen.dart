@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expance_tracker_app/resources/colors.dart' show AppColors;
-import 'package:expance_tracker_app/view/additems/add_items.dart';
 import 'package:expance_tracker_app/widgets/updated_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -129,17 +128,17 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
 
                 const SizedBox(height: 24),
 
-                Text('\$${balance.toStringAsFixed(2)}',
+                Text('\₹${balance.toStringAsFixed(2)}',
                     style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
                 const Text('Total Balance', style: TextStyle(color: Colors.grey)),
                 const SizedBox(height: 24),
 
                 Row(
                   children: [
-                    _buildInfoCard('Income', '\$${totalIncome.toStringAsFixed(2)}',
+                    _buildInfoCard('Income', '\₹${totalIncome.toStringAsFixed(2)}',
                         Colors.green.shade100, Icons.arrow_upward),
                     const SizedBox(width: 16),
-                    _buildInfoCard('Expense', '-\$${totalExpense.toStringAsFixed(2)}',
+                    _buildInfoCard('Expense', '-\₹${totalExpense.toStringAsFixed(2)}',
                         Colors.red.shade100, Icons.arrow_downward),
                   ],
                 ),
@@ -199,6 +198,59 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
     );
   }
 
+Future<void> _showAddIncomeDialog() async {
+  final TextEditingController _controller = TextEditingController();
+
+  await showDialog<void>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Add Income'),
+        content: TextField(
+          controller: _controller,
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(hintText: 'Enter amount'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final text = _controller.text;
+              final amount = double.tryParse(text);
+              if (amount != null && amount > 0) {
+                final uid = FirebaseAuth.instance.currentUser?.uid;
+                if (uid != null) {
+                  await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .collection('expenses')
+                    .add({
+                      'amount': amount,
+                      'type': 'income',
+                      'category': 'Income',
+                      'description': 'Added income',
+                      'date': Timestamp.now(),
+                    });
+                  fetchTransactions();
+                }
+                Navigator.of(context).pop();
+              } else {
+                // optionally show error validation
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  
+
   void _confirmDelete(String uid, String id) {
     showDialog(
       context: context,
@@ -226,31 +278,35 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
   Widget _buildInfoCard(
       String title, String amount, Color bgColor, IconData icon) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(children: [
-          Icon(icon,
-              color: bgColor.computeLuminance() > 0.5
-                  ? Colors.black
-                  : Colors.white),
-          const SizedBox(width: 12),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(color: Colors.black54)),
-                const SizedBox(height: 4),
-                Text(amount,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
+      child: GestureDetector(
+         behavior: HitTestBehavior.opaque,
+            onTap: title == 'Income' ? () => _showAddIncomeDialog() : null,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
           ),
-        ]),
+          child: Row(children: [
+            Icon(icon,
+                color: bgColor.computeLuminance() > 0.5
+                    ? Colors.black
+                    : Colors.white),
+            const SizedBox(width: 12),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(color: Colors.black54)),
+                  const SizedBox(height: 4),
+                  Text(amount,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }

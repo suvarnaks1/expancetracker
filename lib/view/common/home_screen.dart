@@ -70,7 +70,9 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
   @override
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
-    final balance = totalIncome - totalExpense;
+    final balance = (totalIncome - totalExpense).clamp(0.0, double.infinity);
+    final displayedIncome = (totalIncome - totalExpense) > 0 ? totalIncome - totalExpense : 0;
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -280,7 +282,7 @@ Future<void> _showAddIncomeDialog() async {
     return Expanded(
       child: GestureDetector(
          behavior: HitTestBehavior.opaque,
-            onTap: title == 'Income' ? () => _showAddIncomeDialog() : null,
+            onTap: title == 'Income'  ? () => _showAddIncomeDialog() : null,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(

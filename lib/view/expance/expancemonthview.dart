@@ -35,6 +35,11 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
         .snapshots();
 
     return Scaffold(
+        appBar: AppBar(
+        title: Center(child:  Text('Expance')),
+        backgroundColor: AppColors.deepPink,
+        foregroundColor: Colors.white,
+      ),
       backgroundColor: AppColors.lightPink1,
       body: StreamBuilder<QuerySnapshot>(
         stream: stream,
@@ -96,20 +101,10 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
             padding: const EdgeInsets.all(16.0),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // — Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                 
-                  const Text('Expense',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  
-                ],
-              ),
+          
+          
               const SizedBox(height: 16),
 
-              // — Interval Chips
               Row(
                 children: ['Day', 'Week', 'Month'].map((lbl) {
                   final selected = interval == lbl;

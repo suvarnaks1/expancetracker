@@ -4,142 +4,178 @@ import 'package:expance_tracker_app/view/common/bottom_nav.dart';
 import 'package:flutter/material.dart';
 import '../../resources/colors.dart';
 
-class SignupPage extends StatelessWidget {
-  final FirebaseAuthService _auth = FirebaseAuthService();
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
 
-  SignupPage({super.key});
+class _SignupPageState extends State<SignupPage> {
+  final FirebaseAuthService _auth = FirebaseAuthService();
+  final _formKey = GlobalKey<FormState>();
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
+  bool _isLoading = false;
+
+  String? _validateEmail(String? v) {
+    if (v == null || v.isEmpty) return 'Email is required';
+    final email = v.trim();
+    final pattern = RegExp(
+      r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(?:com|in)$',
+      caseSensitive: false,
+    );
+    if (!pattern.hasMatch(email)) return 'Email must end with .com or .in';
+    return null;
+  }
+
+  String? _validatePassword(String? v) {
+    if (v == null || v.isEmpty) return 'Password is required';
+    if (v.length < 6) return 'Password must be ≥ 6 characters';
+    return null;
+  }
+
+  Future<void> _doRegister() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+    final result = await _auth.registerWithEmailAndPassword(
+      emailCtrl.text.trim(),
+      passCtrl.text.trim(),
+    );
+    setState(() => _isLoading = false);
+
+    if (result.status == AuthStatus.success) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration Successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const BottomNav()),
+      );
+    } else {
+      final msg = result.message ?? _friendlyMessage(result.status);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    }
+  }
+
+  String _friendlyMessage(AuthStatus status) {
+    switch (status) {
+      case AuthStatus.emailAlreadyInUse:
+        return 'This email is already registered.';
+      case AuthStatus.invalidEmail:
+        return 'Invalid email address.';
+      case AuthStatus.weakPassword:
+        return 'Password is too weak.';
+      default:
+        return 'Registration failed. Try again.';
+    }
+  }
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final emailCtrl = TextEditingController();
-    final passCtrl = TextEditingController();
-
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            colors: [AppColors.lightPink1, AppColors.lightPink2],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppColors.lightPink1, AppColors.lightPink2],
           ),
         ),
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Create Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.deepPink,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                _buildTextField(emailCtrl, 'Email', Icons.email),
-                const SizedBox(height: 16),
-                _buildTextField(passCtrl, 'Password', Icons.lock, obscure: true),
-                const SizedBox(height: 32),
-                _buildButton(
-                  text: 'Register',
-                  onPressed: () async {
-                    final email = emailCtrl.text.trim();
-                    final password = passCtrl.text.trim();
-                    if (email.isEmpty || password.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Enter all fields")),
-                      );
-                      return;
-                    }
-                    try {
-                      final user = await _auth.registerWithEmailAndPassword(email, password);
-                      if (user != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Registration Successful")),
-                        );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => BottomNav()),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Registration Failed: $e")),
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => LoginPage()),
-                  ),
-                  child: Text(
-                    "Already have an account? Sign in",
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Create Account',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.deepPink),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.deepPink,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController ctrl,
-    String label,
-    IconData icon, {
-    bool obscure = false,
-  }) {
-    return TextField(
-      controller: ctrl,
-      obscureText: obscure,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: AppColors.deepPink),
-        labelText: label,
-        filled: true,
-        fillColor: AppColors.lightPink1,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) {
-    final gradient = LinearGradient(
-      colors: [AppColors.mediumPink, AppColors.deepPink],
-    );
-
-    return Container(
-      height: 52,
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(26),
-          onTap: onPressed,
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+                  const SizedBox(height: 32),
+                  TextFormField(
+                    controller: emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: _validateEmail,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email, color: AppColors.deepPink),
+                      labelText: 'Email',
+                      filled: true,
+                      fillColor: AppColors.lightPink1,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: passCtrl,
+                    obscureText: true,
+                    validator: _validatePassword,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.lock, color: AppColors.deepPink),
+                      labelText: 'Password',
+                      filled: true,
+                      fillColor: AppColors.lightPink1,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _doRegister,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.deepPink,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(26)),
+                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Register',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const LoginPage()),
+                            ),
+                    child: Text(
+                      "Already have an account? Sign in",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.deepPink),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

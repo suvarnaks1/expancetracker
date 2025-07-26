@@ -5,28 +5,23 @@ import 'package:expance_tracker_app/view/auth/login_page.dart';
 import 'package:expance_tracker_app/view/privacy/privacy.dart';
 import 'package:flutter/material.dart';
 
-class ProfileSettingsPage extends StatelessWidget {
-  const ProfileSettingsPage({super.key});
+class SignoutPage extends StatelessWidget {
+  const SignoutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.lightPink1,
+        appBar: AppBar(
+        title: Center(child:  Text('Signout')),
+        backgroundColor: AppColors.deepPink,
+        foregroundColor: Colors.white,
+      ),
       body: SafeArea(
+        
         child: Column(
           children: [
-            // Top header with back and settings icons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                 Text('Settings',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
+           
 
       
 
@@ -38,41 +33,17 @@ class ProfileSettingsPage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                   // "Account" section
-                  Text('Account',
+                  Text('Signout',
                       style: TextStyle(
                           color: AppColors.deepPink.withOpacity(0.8),
                           fontSize: 16,
                           fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
+                  
 
-                  _buildTile(
-                    icon: Icons.person_outline,
-                    title: 'My Account',
-                    onTap: () {},
-                  ),
+                
 
-                  _buildTile(
-                    icon: Icons.lock_outline,
-                    title: 'Privacy',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const PrivacyPolicyScreen()),
-                      );
-                    },
-                  ),
-                  _buildTile(
-                    icon: Icons.info_outline,
-                    title: 'About',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AboutAppScreen()),
-                      );
-                    },
-                  ),
+               
+              
                   _buildTile(
                     icon: Icons.logout,
                     title: 'SignOut',

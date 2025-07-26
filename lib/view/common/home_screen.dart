@@ -74,125 +74,142 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
     final displayedIncome = (totalIncome - totalExpense) > 0 ? totalIncome - totalExpense : 0;
 
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    StreamBuilder<User?>(
-                      stream: FirebaseAuth.instance.userChanges(),
-                      builder: (context, snapshot) {
-                        final user = snapshot.data;
-                        return Row(
-                          children: [
-                            if (user?.photoURL != null)
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage: NetworkImage(user!.photoURL!),
-                              ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                               'Hey, ${user?.displayName ?? 'User'}!',
-
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+    return 
+      WillPopScope(
+  onWillPop: () async {
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Exit App?'),
+        content: const Text('Are you sure you want to exit?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('No')),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Yes')),
+        ],
+      ),
+    );
+    return shouldExit ?? false;
+  },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      StreamBuilder<User?>(
+                        stream: FirebaseAuth.instance.userChanges(),
+                        builder: (context, snapshot) {
+                          final user = snapshot.data;
+                          return Row(
+                            children: [
+                              if (user?.photoURL != null)
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: NetworkImage(user!.photoURL!),
                                 ),
-                                if (user?.email != null)
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
-                                    user!.email!,
+                                 'Hey, ${user?.displayName ?? 'User'}!',
+      
                                     style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
+                                      fontSize: 18,
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                              ],
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                   
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-
-                Text('\₹${balance.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                const Text('Total Balance', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 24),
-
-                Row(
-                  children: [
-                    _buildInfoCard('Income', '\₹${totalIncome.toStringAsFixed(2)}',
-                        Colors.green.shade100, Icons.arrow_upward),
-                    const SizedBox(width: 16),
-                    _buildInfoCard('Expense', '-\₹${totalExpense.toStringAsFixed(2)}',
-                        Colors.red.shade100, Icons.arrow_downward),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                const Text('Your Expense',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 12),
-
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      children: ['All', ...catSpend.keys].map((tab) {
-                    final sel = tab == activeTab;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: ChoiceChip(
-                        label: Text(tab),
-                        selected: sel,
-                        selectedColor: AppColors.deepPink,
-                        backgroundColor: AppColors.lightPink2,
-                        labelStyle: TextStyle(
-                            color: sel ? Colors.white : AppColors.deepPink),
-                        onSelected: (_) {
-                          setState(() => activeTab = tab);
-                          fetchTransactions();
+                                  if (user?.email != null)
+                                    Text(
+                                      user!.email!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          );
                         },
                       ),
-                    );
-                  }).toList()),
-                ),
-                const SizedBox(height: 16),
-
-                ...visibleList.map((doc) {
-                  final d = doc.data() as Map<String, dynamic>;
-                  final dt = (d['date'] as Timestamp).toDate();
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: TransactionCardView(
-                      data: d,
-                      date: DateFormat.yMMMd().format(dt),
-                      onEdit: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => UpdatedPage()
+                     
+                    ],
+                  ),
+      
+                  const SizedBox(height: 24),
+      
+                  Text('\₹${balance.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                  const Text('Total Balance', style: TextStyle(color: Colors.grey)),
+                  const SizedBox(height: 24),
+      
+                  Row(
+                    children: [
+                      _buildInfoCard('Income', '\₹${totalIncome.toStringAsFixed(2)}',
+                          Colors.green.shade100, Icons.arrow_upward),
+                      const SizedBox(width: 16),
+                      _buildInfoCard('Expense', '-\₹${totalExpense.toStringAsFixed(2)}',
+                          Colors.red.shade100, Icons.arrow_downward),
+                    ],
+                  ),
+      
+                  const SizedBox(height: 24),
+                  const Text('Your Expense',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 12),
+      
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: ['All', ...catSpend.keys].map((tab) {
+                      final sel = tab == activeTab;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: ChoiceChip(
+                          label: Text(tab),
+                          selected: sel,
+                          selectedColor: AppColors.deepPink,
+                          backgroundColor: AppColors.lightPink2,
+                          labelStyle: TextStyle(
+                              color: sel ? Colors.white : AppColors.deepPink),
+                          onSelected: (_) {
+                            setState(() => activeTab = tab);
+                            fetchTransactions();
+                          },
                         ),
-                      ).then((_) => fetchTransactions()),
-                      onDelete: () => _confirmDelete(uid!, doc.id),
-                    ),
-                  );
-                }).toList(),
-              ],
+                      );
+                    }).toList()),
+                  ),
+                  const SizedBox(height: 16),
+      
+                  ...visibleList.map((doc) {
+                    final d = doc.data() as Map<String, dynamic>;
+                    final dt = (d['date'] as Timestamp).toDate();
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TransactionCardView(
+                        data: d,
+                        date: DateFormat.yMMMd().format(dt),
+                        onEdit: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UpdatedPage()
+                          ),
+                        ).then((_) => fetchTransactions()),
+                        onDelete: () => _confirmDelete(uid!, doc.id),
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ),
         ),

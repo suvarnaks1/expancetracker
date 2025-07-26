@@ -184,7 +184,7 @@ class _AddItemsState extends State<AddItems> {
                 TextFormField(
                   controller: _amountCtrl,
                   decoration: const InputDecoration(
-                    labelText: 'Amount', prefixText: '\$ ',
+                    labelText: 'Amount', prefixText: '\₹ ',
                   ),
                   keyboardType: TextInputType.number,
                   validator: (v) =>
@@ -205,7 +205,7 @@ class _AddItemsState extends State<AddItems> {
                 DropdownButtonFormField<String>(
                   value: _category,
                   hint: const Text('Select Category'),
-                  items: ['Food', 'Transport', 'Shopping', 'Other']
+                  items: ['Food', 'Transport', 'Shopping', 'Other','Emi','Rent']
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) => setState(() => _category = v),

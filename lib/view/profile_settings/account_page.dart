@@ -18,6 +18,27 @@ class AccountPage extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<AccountPage> {
+    Future<bool> _confirmSignOut(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            child: const Text('No'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          TextButton(
+            child: const Text('Yes'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true;
+  }
   File? _localImage;
   final user = FirebaseAuth.instance.currentUser;
 
@@ -82,111 +103,128 @@ class _EditProfileScreenState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightPink1,
-      appBar: AppBar(
-        title: Center(child:  Text('Account')),
-        backgroundColor: AppColors.deepPink,
-        foregroundColor: Colors.white,
+    return WillPopScope(
+  onWillPop: () async {
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Exit App?'),
+        content: const Text('Are you sure you want to exit?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('No')),
+          TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Yes')),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _showImageSourceDialog,
-              child: CircleAvatar(
-                radius: 60,
-                backgroundColor: AppColors.lightPink2,
-                backgroundImage: _localImage != null
-                    ? FileImage(_localImage!)
-                    : (user?.photoURL != null
-                        ? NetworkImage(user!.photoURL!)
-                        : null) as ImageProvider<Object>?,
-                child: _localImage == null && user?.photoURL == null
-                    ? const Icon(Icons.person, size: 60, color: Colors.white)
-                    : null,
+    );
+    return shouldExit ?? false;
+  },
+      child: Scaffold(
+        backgroundColor: AppColors.lightPink1,
+        appBar: AppBar(
+          title: Center(child:  Text('Account')),
+          backgroundColor: AppColors.deepPink,
+          foregroundColor: Colors.white,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: _showImageSourceDialog,
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundColor: AppColors.lightPink2,
+                  backgroundImage: _localImage != null
+                      ? FileImage(_localImage!)
+                      : (user?.photoURL != null
+                          ? NetworkImage(user!.photoURL!)
+                          : null) as ImageProvider<Object>?,
+                  child: _localImage == null && user?.photoURL == null
+                      ? const Icon(Icons.person, size: 60, color: Colors.white)
+                      : null,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              user?.displayName ?? 'User Name',
-              style:
-                  const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              user?.email ?? 'user@email.com',
-              style: TextStyle(color: AppColors.deepPink.withOpacity(0.7)),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _showImageSourceDialog,
-              icon: const Icon(Icons.edit),
-              label: const Text("Change Photo"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.mediumPink,
+              const SizedBox(height: 16),
+              Text(
+                user?.displayName ?? 'User Name',
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
-            ),
-
-
-            
-            const SizedBox(height: 8),
-            // General settings tiles
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  const SizedBox(height: 24),
-                  // "Account" section
-                  Text('Account',
-                      style: TextStyle(
-                          color: AppColors.deepPink.withOpacity(0.8),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-
-                 
-
-                  _buildTile(
-                    icon: Icons.lock_outline,
-                    title: 'Privacy',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>  PrivacyPolicyScreen()),
-                      );
-                    },
-                  ),
-                  _buildTile(
-                    icon: Icons.info_outline,
-                    title: 'About',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AboutAppScreen()),
-                      );
-                    },
-                  ),
-                  _buildTile(
-                    icon: Icons.logout,
-                    title: 'SignOut',
-                    onTap: () async {
-                      await FirebaseAuthService().signOut();
-
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ],
+              const SizedBox(height: 4),
+              Text(
+                user?.email ?? 'user@email.com',
+                style: TextStyle(color: AppColors.deepPink.withOpacity(0.7)),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _showImageSourceDialog,
+                icon: const Icon(Icons.edit),
+                label: const Text("Change Photo"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.mediumPink,
+                ),
+              ),
+      
+      
+              
+              const SizedBox(height: 8),
+              // General settings tiles
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    const SizedBox(height: 24),
+                    // "Account" section
+                    Text('Account',
+                        style: TextStyle(
+                            color: AppColors.deepPink.withOpacity(0.8),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 8),
+      
+                   
+      
+                    _buildTile(
+                      icon: Icons.lock_outline,
+                      title: 'Privacy',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  PrivacyPolicyScreen()),
+                        );
+                      },
+                    ),
+                    _buildTile(
+                      icon: Icons.info_outline,
+                      title: 'About',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AboutAppScreen()),
+                        );
+                      },
+                    ),
+                   _buildTile(
+                        icon: Icons.logout,
+                        title: 'Sign Out',
+                        onTap: () async {
+                          final ok = await _confirmSignOut(context);
+                          if (!ok) return;
+                          await FirebaseAuthService().signOut();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => LoginPage()),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

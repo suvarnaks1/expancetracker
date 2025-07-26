@@ -6,7 +6,6 @@ import 'package:expance_tracker_app/view/common/signout_page.dart';
 import 'package:expance_tracker_app/view/profile_settings/account_page.dart';
 import 'package:flutter/material.dart';
 
-
 class BottomNav extends StatefulWidget {
   const BottomNav({super.key});
   @override
@@ -30,7 +29,6 @@ class _MainScreenState extends State<BottomNav> {
     return Scaffold(
       backgroundColor: AppColors.lightPink1,
       body: _pages[_selectedIndex],
-
       floatingActionButton: Container(
         width: 64,
         height: 64,
@@ -45,18 +43,23 @@ class _MainScreenState extends State<BottomNav> {
         child: FloatingActionButton(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          onPressed: (){
-Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => AddItems(existingId: '', initialAmount: null, initialDesc: null, initialCategory: null, )),
-                        (route) => false,
-                      );
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => AddItems(
+                        existingId: '',
+                        initialAmount: null,
+                        initialDesc: null,
+                        initialCategory: null,
+                      )),
+              (route) => false,
+            );
           },
           child: const Icon(Icons.add, size: 32),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       bottomNavigationBar: BottomAppBar(
         color: AppColors.mediumPink,
         shape: const CircularNotchedRectangle(),

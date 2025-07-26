@@ -19,10 +19,11 @@ class ProfileSettingsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.arrow_back_ios, color: AppColors.deepPink),
-                  Icon(Icons.settings, color: AppColors.deepPink),
+                 Text('Settings',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

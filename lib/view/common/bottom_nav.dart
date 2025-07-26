@@ -21,7 +21,6 @@ class _MainScreenState extends State<BottomNav> {
     ExpenseMonthView(),
     EditProfileScreen(),
     ProfileSettingsPage(),
-    
   ];
 
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);

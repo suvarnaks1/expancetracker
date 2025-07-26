@@ -98,16 +98,13 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               // — Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios, color: AppColors.deepPink),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                 
                   const Text('Expense',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Icon(Icons.calendar_today, color: AppColors.deepPink),
+                  
                 ],
               ),
               const SizedBox(height: 16),

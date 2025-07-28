@@ -205,7 +205,7 @@ class _AddItemsState extends State<AddItems> {
                 DropdownButtonFormField<String>(
                   value: _category,
                   hint: const Text('Select Category'),
-                  items: ['Food', 'Transport', 'Shopping', 'Other','Emi','Rent']
+                  items: ['Food', 'Transport', 'Shopping', 'Emi','Rent','Other',]
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) => setState(() => _category = v),

@@ -120,7 +120,7 @@ class _EditProfileScreenState extends State<AccountPage> {
   },
       child: Scaffold(
         backgroundColor: AppColors.lightPink1,
-        appBar: AppBar(
+        appBar: AppBar(automaticallyImplyLeading: false,
           title: Center(child:  Text('Account')),
           backgroundColor: AppColors.deepPink,
           foregroundColor: Colors.white,

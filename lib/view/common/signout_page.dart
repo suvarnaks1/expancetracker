@@ -51,7 +51,7 @@ class SignoutPage extends StatelessWidget {
       },
       child: Scaffold(
         backgroundColor: AppColors.lightPink1,
-        appBar: AppBar(
+        appBar: AppBar(automaticallyImplyLeading: false,
           title: const Center(child: Text('Sign Out')),
           backgroundColor: AppColors.deepPink,
           foregroundColor: Colors.white,

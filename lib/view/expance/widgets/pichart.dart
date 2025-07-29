@@ -37,10 +37,23 @@ class PieChartWidget extends StatelessWidget {
     ));
   }
 
-  Color _colorFor(String cat) => {
+  // Color _colorFor(String cat) => {
+  //       'Food': Colors.green,
+  //       'Shopping': Colors.orange,
+  //       'Transport': Colors.blue,
+  //     }[cat] ??
+  //     Colors.grey;
+
+
+
+
+       Color _colorFor(String cat) => {
         'Food': Colors.green,
         'Shopping': Colors.orange,
         'Transport': Colors.blue,
+        'Emi': Colors.red,
+        'Rent': Colors.purple,
+        'Income': Colors.yellow,
       }[cat] ??
-      Colors.grey;
+      const Color.fromARGB(255, 56, 4, 247);
 }

@@ -44,7 +44,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
 
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false,
+      appBar: AppBar(
         title: Center(child:  Text('Expenses')),
         backgroundColor: AppColors.deepPink,
           foregroundColor: Colors.white,
@@ -118,10 +118,10 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                   style: Theme.of(context).textTheme.titleMedium),
               SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(50.0),
                 child: SizedBox(
                   height: chartHeight,
-                  child: Row(
+                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: PieChartWidget(
@@ -130,7 +130,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                           onTap: (i) => setState(() => touchedPie = i),
                         ),
                       ),
-                      SizedBox(width: 30),
+                      SizedBox(width: 50),
                       Expanded(
                         child: Wrap(
                           spacing: spacing * 0.5,
@@ -158,17 +158,20 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                   ),
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 30),
               // Text('Trend ($interval)',
               //     style: Theme.of(context).textTheme.titleMedium),
               SizedBox(height: spacing),
-              SizedBox(
-                height: chartHeight,
-                child: BarChartWidget(
-                  data: barData,
-                  touchedIndex: safeBar,
-                  onTap: (i) => setState(() => touchedBar = i),
-                  interval: interval,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: chartHeight,
+                  child: BarChartWidget(
+                    data: barData,
+                    touchedIndex: safeBar,
+                    onTap: (i) => setState(() => touchedBar = i),
+                    interval: interval,
+                  ),
                 ),
               ),
             ]),

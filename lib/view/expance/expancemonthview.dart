@@ -16,7 +16,8 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
   String activeTab = 'All';
   int touchedPie = -1, touchedBar = -1;
 
-  Color _colorFor(String cat) => {
+  Color _colorFor(String cat) =>
+      {
         'Food': Colors.green,
         'Shopping': Colors.orange,
         'Transport': Colors.blue,
@@ -26,15 +27,12 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
       }[cat] ??
       const Color.fromARGB(255, 56, 4, 247);
 
-
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width, height = size.height;
     final padding = width * 0.04, spacing = height * 0.02;
     final chartHeight = height * 0.25;
-    
 
     final uid = FirebaseAuth.instance.currentUser!.uid;
     final stream = FirebaseFirestore.instance
@@ -42,12 +40,11 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
         .orderBy('date', descending: true)
         .snapshots();
 
-
     return Scaffold(
       appBar: AppBar(
-        title: Center(child:  Text('Expenses')),
+        title: Center(child: Text('Expenses')),
         backgroundColor: AppColors.deepPink,
-          foregroundColor: Colors.white,
+        foregroundColor: Colors.white,
       ),
       backgroundColor: AppColors.lightPink1,
       body: StreamBuilder<QuerySnapshot>(
@@ -56,7 +53,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-    
+
           final docs = snap.data!.docs;
           final now = DateTime.now();
           final count = interval == 'Day'
@@ -65,19 +62,19 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                   ? 7
                   : DateUtils.getDaysInMonth(now.year, now.month);
           final barData = List<double>.filled(count, 0);
-    
+
           final start = interval == 'Day'
               ? DateTime(now.year, now.month, now.day)
               : interval == 'Week'
                   ? now.subtract(Duration(days: now.weekday - 1))
                   : DateTime(now.year, now.month, 1);
-    
+
           final catSpend = <String, double>{};
           final filtered = docs.where((doc) {
             final dt = (doc['date'] as Timestamp).toDate();
             return !dt.isBefore(start);
           }).toList();
-    
+
           for (var doc in filtered) {
             final d = doc.data()! as Map<String, dynamic>;
             final amt = (d['amount'] as num).toDouble();
@@ -90,19 +87,22 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                     : dt.day - 1;
             if (idx >= 0 && idx < count) barData[idx] += amt;
           }
-    
-          final safeBar = (touchedBar >= 0 && touchedBar < count) ? touchedBar : -1;
-    
+
+          final safeBar =
+              (touchedBar >= 0 && touchedBar < count) ? touchedBar : -1;
+
           return SingleChildScrollView(
             padding: EdgeInsets.all(10),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Wrap(
                 spacing: spacing,
                 children: ['Day', 'Week', 'Month'].map((lbl) {
                   final sel = interval == lbl;
                   return ChoiceChip(
                     label: Text(lbl,
-                        style: TextStyle(color: sel ? Colors.white : AppColors.deepPink)),
+                        style: TextStyle(
+                            color: sel ? Colors.white : AppColors.deepPink)),
                     selected: sel,
                     selectedColor: AppColors.deepPink,
                     backgroundColor: AppColors.lightPink2,
@@ -117,45 +117,50 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
               Text('Spending by Category',
                   style: Theme.of(context).textTheme.titleMedium),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: SizedBox(
-                  height: chartHeight,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: PieChartWidget(
-                          data: catSpend,
-                          touchedIndex: touchedPie,
-                          onTap: (i) => setState(() => touchedPie = i),
-                        ),
+              SizedBox(
+                height: chartHeight,
+                child: Row(
+                  
+                  children: [
+                    SizedBox(width: 40,),
+                    Expanded(
+                      child: PieChartWidget(
+                        data: catSpend,
+                        touchedIndex: touchedPie,
+                        onTap: (i) => setState(() => touchedPie = i),
                       ),
-                      SizedBox(width: 50),
-                      Expanded(
-                        child: Wrap(
-                          spacing: spacing * 0.5,
-                          runSpacing: spacing * 0.5,
-                          children: catSpend.entries.map((e) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: width * 0.03,
-                                  height: width * 0.03,
-                                  decoration: BoxDecoration(
-                                    color: _colorFor(e.key),
-                                    shape: BoxShape.circle,
+                    ),
+                    SizedBox(width: 70),
+                    Expanded(
+                      child: Wrap(
+                        spacing: spacing * 0.5,
+                        runSpacing: spacing * 0.5,
+                        children: catSpend.entries.map((e) {
+                          return Column(
+                            children: [
+                              Row(
+                                //mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: width * 0.03,
+                                    height: width * 0.03,
+                                    decoration: BoxDecoration(
+                                      color: _colorFor(e.key),
+                                      shape: BoxShape.circle,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: width * 0.02),
-                                Text(e.key, style: TextStyle(fontSize: width * 0.035)),
-                              ],
-                            );
-                          }).toList(),
-                        ),
+                                  SizedBox(width: width * 0.02),
+                                  Text(e.key,
+                                      style:
+                                          TextStyle(fontSize: width * 0.035)),
+                                ],
+                              ),
+                            ],
+                          );
+                        }).toList(),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 30),

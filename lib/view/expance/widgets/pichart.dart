@@ -19,9 +19,13 @@ class PieChartWidget extends StatelessWidget {
     return PieChart(PieChartData(
       sectionsSpace: 2,
       centerSpaceRadius: 40,
-      pieTouchData: PieTouchData(touchCallback: (_, resp) {
-        onTap(resp?.touchedSection?.touchedSectionIndex ?? -1);
-      }),
+      pieTouchData: PieTouchData(
+         enabled: false,
+         touchCallback: null,
+      //   touchCallback: (_, resp) {
+      //   onTap(resp?.touchedSection?.touchedSectionIndex ?? -1);
+      // }
+      ),
       sections: List.generate(data.length, (i) {
         final e = data.entries.elementAt(i);
         final isTouched = i == touchedIndex;

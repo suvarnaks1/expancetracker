@@ -44,7 +44,18 @@ class BarChartWidget extends StatelessWidget {
 
                 String lbl;
                 if (interval == 'Day') {
-                  lbl = '${i}h';
+                 if (i % 4 != 0 && i != data.length - 1) {
+          return const SizedBox();
+        }
+        return SideTitleWidget(
+          meta: meta,
+          space: 8,
+          child: Text(
+            '${i}h',
+            style: const TextStyle(color: AppColors.deepPink, fontSize: 10),
+          ),
+        );
+      
                 } else if (interval == 'Week') {
                   const wk = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                   lbl = wk[i];

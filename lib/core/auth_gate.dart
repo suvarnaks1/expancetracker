@@ -1,7 +1,7 @@
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:expance_tracker_app/core/auth_service.dart';
+
 import 'package:expance_tracker_app/view/auth/login_page.dart';
 import 'package:expance_tracker_app/view/common/bottom_nav.dart';
 class AuthGate extends StatelessWidget {

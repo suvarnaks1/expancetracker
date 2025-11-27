@@ -30,6 +30,7 @@ class SignoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         final shouldExit = await showDialog<bool>(
@@ -68,6 +69,7 @@ class SignoutPage extends StatelessWidget {
                     Text(
                       'Sign Out',
                       style: TextStyle(
+                        // ignore: deprecated_member_use
                         color: AppColors.deepPink.withOpacity(0.8),
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

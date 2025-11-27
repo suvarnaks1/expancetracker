@@ -103,6 +103,7 @@ class _EditProfileScreenState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: deprecated_member_use
     return WillPopScope(
   onWillPop: () async {
     final shouldExit = await showDialog<bool>(
@@ -153,6 +154,7 @@ class _EditProfileScreenState extends State<AccountPage> {
               const SizedBox(height: 4),
               Text(
                 user?.email ?? 'user@email.com',
+                // ignore: deprecated_member_use
                 style: TextStyle(color: AppColors.deepPink.withOpacity(0.7)),
               ),
               const SizedBox(height: 24),
@@ -177,6 +179,7 @@ class _EditProfileScreenState extends State<AccountPage> {
                     // "Account" section
                     Text('Account',
                         style: TextStyle(
+                            // ignore: deprecated_member_use
                             color: AppColors.deepPink.withOpacity(0.8),
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),

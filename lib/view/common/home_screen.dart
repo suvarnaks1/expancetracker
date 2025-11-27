@@ -43,7 +43,7 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
     final categoryMap = <String, double>{};
 
     for (var doc in docs) {
-      final data = doc.data() as Map<String, dynamic>;
+      final data = doc.data();
       final cat = data['category'] ?? 'Others';
       final amount = (data['amount'] as num).toDouble();
       final isIncome = data['type'] == 'income';
@@ -71,10 +71,10 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final balance = (totalIncome - totalExpense).clamp(0.0, double.infinity);
-    final displayedIncome = (totalIncome - totalExpense) > 0 ? totalIncome - totalExpense : 0;
 
 
     return 
+      // ignore: deprecated_member_use
       WillPopScope(
   onWillPop: () async {
     final shouldExit = await showDialog<bool>(

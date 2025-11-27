@@ -198,7 +198,7 @@ class _AddItemsState extends State<AddItems> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _category,
+                      initialValue: _category,
                       hint: const Text('Select Category'),
                       items: ['Food', 'Transport', 'Shopping', 'Other']
                           .map((c) => DropdownMenuItem(value: c, child: Text(c)))

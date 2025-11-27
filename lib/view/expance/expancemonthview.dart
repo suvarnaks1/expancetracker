@@ -31,7 +31,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width, height = size.height;
-    final padding = width * 0.04, spacing = height * 0.02;
+    final spacing = height * 0.02;
     final chartHeight = height * 0.25;
 
     final uid = FirebaseAuth.instance.currentUser!.uid;

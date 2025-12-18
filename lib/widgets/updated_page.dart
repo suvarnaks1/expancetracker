@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:expance_tracker_app/resources/colors.dart';
 
 class UpdatedPage extends StatefulWidget {
-  const UpdatedPage({super.key});
+  const UpdatedPage({super.key, required String docId});
   @override
   _UpdatedPageState createState() => _UpdatedPageState();
 }

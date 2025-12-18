@@ -201,7 +201,7 @@ class _FinanceDashboardState extends State<FinanceDashboard> {
                         onEdit: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => UpdatedPage()
+                            builder: (_) => UpdatedPage(docId: '',)
                           ),
                         ).then((_) => fetchTransactions()),
                         onDelete: () => _confirmDelete(uid!, doc.id),

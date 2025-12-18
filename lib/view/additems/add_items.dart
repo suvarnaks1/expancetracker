@@ -110,7 +110,7 @@ class _AddItemsState extends State<AddItems> {
       if (!mounted) return;
        Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ExpenseMonthView()),
+              MaterialPageRoute(builder: (context) => BottomNav()),
             );
     } catch (e) {
       if (mounted) {
@@ -203,7 +203,7 @@ class _AddItemsState extends State<AddItems> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  initialValue: _category,
+                  value: _category,
                   hint: const Text('Select Category'),
                   items: ['Food', 'Transport', 'Shopping', 'Emi','Rent','Other',]
                       .map((c) => DropdownMenuItem(value: c, child: Text(c)))

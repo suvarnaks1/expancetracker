@@ -71,7 +71,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
         'Transport': Colors.blue,
         'Emi': Colors.red,
         'Rent': Colors.pink,
-        'Income': Colors.yellow,
+       
       }[cat] ??
       const Color.fromARGB(255, 56, 4, 247);
 
@@ -177,7 +177,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Total: \$${totalMonthSpending.toStringAsFixed(2)}',
+                            'Total: \₹${totalMonthSpending.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[700],
@@ -311,7 +311,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                                           ),
                                           SizedBox(width: 8),
                                           Text(
-                                            '\$${e.value.toStringAsFixed(2)}',
+                                            '\₹${e.value.toStringAsFixed(2)}',
                                             style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w500,
@@ -344,80 +344,81 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                   ),
                   
                   SizedBox(height: 30),
+                  //bar chart
                   
                   // Daily spending trend for the month
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Daily Spending Trend - ${DateFormat('MMMM').format(_selectedDate)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: AppColors.deepPink,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        SizedBox(
-                          height: chartHeight,
-                          child: BarChartWidget(
-                            data: barData,
-                            touchedIndex: safeBar,
-                            onTap: (i) => setState(() => touchedBar = i),
-                            interval: 'Month',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ] else ...[
-                  // Show message if no expenses for selected month
-                  Container(
-                    height: height * 0.5,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.access_alarm,
-                            size: 60,
-                            color: Colors.grey[400],
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            'No expenses in ${DateFormat('MMMM yyyy').format(_selectedDate)}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            'Add expenses to see your spending breakdown',
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                //   Container(
+                //     padding: EdgeInsets.all(12),
+                //     decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       borderRadius: BorderRadius.circular(10),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.black12,
+                //           blurRadius: 4,
+                //           offset: Offset(0, 2),
+                //         ),
+                //       ],
+                //     ),
+                //     child: Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Text(
+                //           'Daily Spending Trend - ${DateFormat('MMMM').format(_selectedDate)}',
+                //           style: TextStyle(
+                //             fontWeight: FontWeight.bold,
+                //             fontSize: 16,
+                //             color: AppColors.deepPink,
+                //           ),
+                //         ),
+                //         SizedBox(height: 10),
+                //         SizedBox(
+                //           height: chartHeight,
+                //           child: BarChartWidget(
+                //             data: barData,
+                //             touchedIndex: safeBar,
+                //             onTap: (i) => setState(() => touchedBar = i),
+                //             interval: 'Month',
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ] else ...[
+                //   // Show message if no expenses for selected month
+                //   Container(
+                //     height: height * 0.5,
+                //     child: Center(
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           Icon(
+                //             Icons.access_alarm,
+                //             size: 60,
+                //             color: Colors.grey[400],
+                //           ),
+                //           SizedBox(height: 20),
+                //           Text(
+                //             'No expenses in ${DateFormat('MMMM yyyy').format(_selectedDate)}',
+                //             style: TextStyle(
+                //               fontSize: 18,
+                //               color: Colors.grey[600],
+                //               fontWeight: FontWeight.w500,
+                //             ),
+                //           ),
+                //           SizedBox(height: 10),
+                //           Text(
+                //             'Add expenses to see your spending breakdown',
+                //             style: TextStyle(
+                //               color: Colors.grey[500],
+                //             ),
+                //             textAlign: TextAlign.center,
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ],
                 
                 SizedBox(height: 20),
                 
@@ -490,8 +491,8 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
                 ],
                 
                 SizedBox(height: 20),
-              ],
-            ),
+              ]
+        ]),
           );
         },
       ),

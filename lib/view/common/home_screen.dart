@@ -373,8 +373,8 @@ class TransactionCardView extends StatelessWidget {
             children: [
               Text(
                 (data['type'] == 'income'
-                    ? '+\$${(data['amount'] as num).toStringAsFixed(2)}'
-                    : '-\$${(data['amount'] as num).toStringAsFixed(2)}'),
+                    ? '+\₹${(data['amount'] as num).toStringAsFixed(2)}'
+                    : '-\₹${(data['amount'] as num).toStringAsFixed(2)}'),
                 style: TextStyle(
                   color: data['type'] == 'income' ? Colors.green : Colors.red,
                   fontWeight: FontWeight.bold,

@@ -4,6 +4,7 @@ import 'package:expance_tracker_app/view/expance/expancemonthview.dart';
 import 'package:expance_tracker_app/view/common/home_screen.dart';
 import 'package:expance_tracker_app/view/common/signout_page.dart';
 import 'package:expance_tracker_app/view/profile_settings/account_page.dart';
+import 'package:expance_tracker_app/view/reminder/screens/add_reminder_page.dart';
 import 'package:flutter/material.dart';
 
 class BottomNav extends StatefulWidget {
@@ -18,8 +19,11 @@ class _MainScreenState extends State<BottomNav> {
   final _pages = [
     FinanceDashboard(),
     ExpenseMonthView(),
+    BillRemindersPage(),
     AccountPage(),
     SignoutPage(),
+    hello()
+
   ];
 
   void _onItemTapped(int index) => setState(() => _selectedIndex = index);
@@ -75,11 +79,13 @@ class _MainScreenState extends State<BottomNav> {
                 Row(children: [
                   _buildNavIcon(Icons.home, 0),
                   _buildNavIcon(Icons.bar_chart, 1),
+                  _buildNavIcon(Icons.calendar_today, 2),
                 ]),
                 // Right icons
                 Row(children: [
-                  _buildNavIcon(Icons.person, 2),
-                  _buildNavIcon(Icons.logout, 3),
+                  _buildNavIcon(Icons.person, 3),
+                  _buildNavIcon(Icons.logout, 4),
+                   _buildNavIcon(Icons.no_backpack, 5),
                 ]),
               ],
             ),
@@ -97,5 +103,15 @@ class _MainScreenState extends State<BottomNav> {
       color: color,
       onPressed: () => _onItemTapped(index),
     );
+  }
+}
+
+
+class hello extends StatelessWidget {
+  const hello({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
   }
 }

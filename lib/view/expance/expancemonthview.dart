@@ -90,6 +90,7 @@ class _ExpenseMonthViewState extends State<ExpenseMonthView> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Center(child: Text('Expenses')),
         backgroundColor: AppColors.deepPink,
         foregroundColor: Colors.white,
